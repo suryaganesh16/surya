@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Farmer Details – Organic Farming Advisor{% endblock %}
+{% block step1_class %}active{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>Step 1: Farmer &amp; Crop Details</h2>
+  <p class="subtitle">Tell us about yourself and the crop you are growing so we can give you the best organic farming advice.</p>
+
+  <form action="/land-details" method="POST" novalidate>
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="name">Farmer Name <span class="required">*</span></label>
+        <input type="text" id="name" name="name"
+               value="{{ form.name if form else '' }}"
+               placeholder="e.g., Ramaiah Reddy" required />
+        {% if errors and errors.name %}
+          <span class="error">{{ errors.name }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number <span class="required">*</span></label>
+        <input type="tel" id="phone" name="phone"
+               value="{{ form.phone if form else '' }}"
+               placeholder="10-digit mobile number" maxlength="10" required />
+        {% if errors and errors.phone %}
+          <span class="error">{{ errors.phone }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="village">Village / Town <span class="required">*</span></label>
+        <input type="text" id="village" name="village"
+               value="{{ form.village if form else '' }}"
+               placeholder="e.g., Nandipeta" required />
+        {% if errors and errors.village %}
+          <span class="error">{{ errors.village }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="pincode">Pincode <span class="required">*</span></label>
+        <input type="text" id="pincode" name="pincode"
+               value="{{ form.pincode if form else '' }}"
+               placeholder="6-digit pincode" maxlength="6" required />
+        {% if errors and errors.pincode %}
+          <span class="error">{{ errors.pincode }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="crop">Crop You Are Growing <span class="required">*</span></label>
+        <input type="text" id="crop" name="crop"
+               value="{{ form.crop if form else '' }}"
+               placeholder="e.g., Paddy, Cotton, Maize" required />
+        {% if errors and errors.crop %}
+          <span class="error">{{ errors.crop }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group area-group">
+        <label for="area">Land Area <span class="required">*</span></label>
+        <div class="area-input">
+          <input type="number" id="area" name="area"
+                 value="{{ form.area if form else '' }}"
+                 placeholder="e.g., 2.5" min="0.1" step="0.1" required />
+          <select name="area_unit" id="area_unit">
+            <option value="acres" {% if form and form.area_unit == 'acres' %}selected{% endif %}>Acres</option>
+            <option value="hectares" {% if form and form.area_unit == 'hectares' %}selected{% endif %}>Hectares</option>
+            <option value="guntas" {% if form and form.area_unit == 'guntas' %}selected{% endif %}>Guntas</option>
+          </select>
+        </div>
+        {% if errors and errors.area %}
+          <span class="error">{{ errors.area }}</span>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Next: Land &amp; Season Details →
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}

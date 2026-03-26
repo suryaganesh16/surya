@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Select Fertilizer – Organic Farming Advisor{% endblock %}
+{% block step3_class %}active{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>Step 3: Crop Suitability &amp; Fertilizer Replacement</h2>
+
+  <!-- Crop Suitability Block -->
+  <div class="info-box green">
+    <h3>🌾 Crops Suitable for Your Land</h3>
+    <p>
+      Based on your <strong>{{ land.soil_type }}</strong> soil, <strong>{{ water_level_label }}</strong> water availability,
+      and <strong>{{ land.season }}</strong> season:
+    </p>
+    {% if recommended_crops %}
+      <ul class="crop-list">
+        {% for crop in recommended_crops %}
+          <li>🌿 {{ crop }}</li>
+        {% endfor %}
+      </ul>
+      <p class="note">
+        <strong>Your selected crop: {{ farmer.crop }}</strong>
+        {% if farmer.crop in recommended_crops %}
+          ✅ — Great choice for your land conditions!
+        {% else %}
+          ⚠️ — May need extra care; consult your local agriculture office for suitability.
+        {% endif %}
+      </p>
+    {% else %}
+      <p>No specific crop data found for this combination. Please consult your local Krishi Vigyan Kendra (KVK).</p>
+    {% endif %}
+  </div>
+
+  <!-- Fertilizer Selection -->
+  <h3 class="section-heading">🧪 Which Chemical Fertilizer(s) Do You Want to Replace?</h3>
+  <p class="subtitle">Select all that apply. We will suggest the best organic alternatives for each.</p>
+
+  {% if error %}
+    <div class="alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form action="/recommendations" method="POST" novalidate>
+
+    <div class="fertilizer-grid">
+      {% for fert in chemical_fertilizers %}
+      <label class="fert-card">
+        <input type="checkbox" name="fertilizers" value="{{ fert }}" />
+        <span class="fert-icon">🧪</span>
+        <span class="fert-name">{{ fert }}</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="form-actions">
+      <a href="/" class="btn btn-secondary">← Restart</a>
+      <button type="submit" class="btn btn-primary">
+        Get My Organic Farming Recommendations →
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}
