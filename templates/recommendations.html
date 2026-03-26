@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}Organic Farming Recommendations – Organic Farming Advisor{% endblock %}
+{% block step4_class %}active{% endblock %}
+
+{% block content %}
+
+<!-- Farmer Summary Card -->
+<section class="card summary-card">
+  <h2>📋 Farmer Profile Summary</h2>
+  <div class="summary-grid">
+    <div><span class="label">👨‍🌾 Farmer</span><span class="value">{{ farmer.name }}</span></div>
+    <div><span class="label">📞 Phone</span><span class="value">{{ farmer.phone }}</span></div>
+    <div><span class="label">🏘️ Village</span><span class="value">{{ farmer.village }} – {{ farmer.pincode }}</span></div>
+    <div><span class="label">🌾 Crop</span><span class="value">{{ farmer.crop }}</span></div>
+    <div><span class="label">📐 Area</span><span class="value">{{ farmer.area }} {{ farmer.area_unit }}</span></div>
+    <div><span class="label">🌍 Soil Type</span><span class="value">{{ land.soil_type }}</span></div>
+    <div><span class="label">💧 Water</span><span class="value">{{ water_level_label }}</span></div>
+    <div><span class="label">📅 Season</span><span class="value">{{ land.season }}</span></div>
+    <div><span class="label">🌤️ Weather</span><span class="value">{{ land.weather }}</span></div>
+    {% if land.soil_ph %}
+    <div><span class="label">⚗️ Soil pH</span><span class="value">{{ land.soil_ph }}</span></div>
+    {% endif %}
+    {% if land.soil_health %}
+    <div class="full-col"><span class="label">🩺 Soil Issues</span><span class="value">{{ land.soil_health }}</span></div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Crop Suitability -->
+<section class="card">
+  <h2>🌾 Suitable Crops for Your Land &amp; Season</h2>
+  <p>
+    Based on <strong>{{ land.soil_type }}</strong> soil · <strong>{{ water_level_label }}</strong> ·
+    <strong>{{ land.season }}</strong> season:
+  </p>
+  {% if recommended_crops %}
+    <div class="tag-list">
+      {% for crop in recommended_crops %}
+        <span class="tag {% if farmer.crop.lower() in crop.lower() %}tag-highlight{% endif %}">
+          🌿 {{ crop }} {% if farmer.crop.lower() in crop.lower() %}✅{% endif %}
+        </span>
+      {% endfor %}
+    </div>
+    {% set is_match = farmer.crop | lower in (recommended_crops | join(' ') | lower) %}
+    {% if is_match %}
+      <div class="alert-success">✅ <strong>{{ farmer.crop }}</strong> is well-suited to your land conditions. Excellent choice!</div>
+    {% else %}
+      <div class="alert-warning">⚠️ <strong>{{ farmer.crop }}</strong> is not in the typical recommended list for your land/season. Consider the crops above, or take extra soil preparation steps before planting.</div>
+    {% endif %}
+  {% else %}
+    <p>No crop data found for this specific combination. Consult your nearest Krishi Vigyan Kendra (KVK).</p>
+  {% endif %}
+</section>
+
+<!-- Soil Health Analysis -->
+<section class="card">
+  <h2>🧪 Soil Health Analysis – {{ land.soil_type }} Soil</h2>
+  {% if soil_advice %}
+    <div class="info-box blue">
+      <p><strong>Characteristics:</strong> {{ soil_advice.characteristics }}</p>
+    </div>
+
+    {% if soil_advice.challenges %}
+    <h3>⚠️ Common Challenges</h3>
+    <ul class="challenge-list">
+      {% for c in soil_advice.challenges %}
+        <li>{{ c }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if land.soil_ph %}
+      <div class="info-box yellow">
+        <strong>Your Soil pH: {{ land.soil_ph }}</strong> —
+        {% set ph = land.soil_ph | float %}
+        {% if ph < 6 %}
+          Your soil is <strong>acidic</strong>. Apply dolomite lime or wood ash to raise pH towards 6–7.
+        {% elif ph > 7.5 %}
+          Your soil is <strong>alkaline</strong>. Apply organic matter, sulphur powder, or neem cake to gradually lower pH.
+        {% else %}
+          Your pH is in the <strong>ideal range (6–7.5)</strong>. Maintain with regular organic matter additions.
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if land.soil_health %}
+    <div class="info-box yellow">
+      <strong>Your Reported Soil Issues:</strong> {{ land.soil_health }}<br />
+      <em>Our recommendations below are tailored to address these challenges.</em>
+    </div>
+    {% endif %}
+
+    <h3>🌱 Recommended Organic Soil Amendments</h3>
+    <ul class="amendment-list">
+      {% for amendment in soil_advice.organic_amendments %}
+        <li>{{ amendment }}</li>
+      {% endfor %}
+    </ul>
+
+    <h3>🦠 Recommended Biofertilizers</h3>
+    <div class="tag-list">
+      {% for bf in soil_advice.biofertilizers %}
+        <span class="tag tag-bio">🔬 {{ bf }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="info-box green">
+      <strong>pH Management:</strong> {{ soil_advice.ph_management }}
+    </div>
+  {% endif %}
+</section>
+
+<!-- Chemical → Organic Fertilizer Replacements -->
+{% if fertilizer_recs %}
+<section class="card">
+  <h2>🔄 Chemical Fertilizer Replacement Guide</h2>
+  <p>Here are your selected chemical fertilizers and their organic alternatives:</p>
+
+  {% for rec in fertilizer_recs %}
+  <div class="fert-replacement-block">
+    <div class="fert-replacement-header">
+      <span class="fert-badge chemical-badge">🧪 {{ rec.chemical }}</span>
+      <span class="arrow-right">→</span>
+      <span class="fert-badge organic-badge">🌿 Organic Alternatives</span>
+    </div>
+    <p class="fert-description">{{ rec.info.description }}</p>
+
+    <div class="alternatives-grid">
+      {% for alt in rec.info.organic_alternatives %}
+      <div class="alternative-card">
+        <h4>🌿 {{ alt.name }}</h4>
+        <div class="alt-detail">
+          <span class="alt-label">📋 Preparation:</span>
+          <span>{{ alt.preparation }}</span>
+        </div>
+        <div class="alt-detail">
+          <span class="alt-label">🪣 Application:</span>
+          <span>{{ alt.application }}</span>
+        </div>
+        <div class="alt-detail">
+          <span class="alt-label">✨ Benefits:</span>
+          <span>{{ alt.benefits }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<!-- Crop-Specific Organic Schedule -->
+{% if crop_tips %}
+<section class="card">
+  <h2>📅 Organic Farming Schedule for {{ farmer.crop }}</h2>
+  <div class="info-box blue">
+    <strong>Key Nutrients Needed:</strong> {{ crop_tips.key_nutrients }}
+  </div>
+
+  <h3>🗓️ Application Schedule</h3>
+  <ol class="schedule-list">
+    {% for step in crop_tips.organic_schedule %}
+      <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+
+  <div class="tips-row">
+    <div class="tip-box">
+      <h4>💧 Water Management</h4>
+      <p>{{ crop_tips.water_management }}</p>
+    </div>
+    <div class="tip-box">
+      <h4>🌿 Weed Management</h4>
+      <p>{{ crop_tips.weed_management }}</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Organic Pest/Disease Sprays -->
+<section class="card">
+  <h2>🌿 Organic Sprays to Replace Pesticides &amp; Fungicides</h2>
+  <div class="sprays-grid">
+    {% for spray in organic_sprays %}
+    <div class="spray-card">
+      <h4>🧴 {{ spray.name }}</h4>
+      <div class="alt-detail">
+        <span class="alt-label">🧪 Preparation:</span>
+        <span>{{ spray.preparation }}</span>
+      </div>
+      <div class="alt-detail">
+        <span class="alt-label">🪣 Application:</span>
+        <span>{{ spray.application }}</span>
+      </div>
+      <div class="alt-detail">
+        <span class="alt-label">🛡️ Controls:</span>
+        <span>{{ spray.controls }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- General Organic Farming Tips -->
+<section class="card">
+  <h2>💡 General Organic Farming Tips</h2>
+  <div class="tips-grid">
+    <div class="tip-item">
+      <span class="tip-icon">♻️</span>
+      <div>
+        <strong>Compost Everything</strong>
+        <p>Convert all crop residues, kitchen waste, and weeds into compost. Target 5–10 tonnes/acre/year.</p>
+      </div>
+    </div>
+    <div class="tip-item">
+      <span class="tip-icon">🔄</span>
+      <div>
+        <strong>Crop Rotation</strong>
+        <p>Rotate cereals with legumes every season. Legumes fix nitrogen and break pest/disease cycles.</p>
+      </div>
+    </div>
+    <div class="tip-item">
+      <span class="tip-icon">🌾</span>
+      <div>
+        <strong>Mulching</strong>
+        <p>Cover soil with 5–10 cm of straw, dry leaves, or grass clippings to retain moisture and suppress weeds.</p>
+      </div>
+    </div>
+    <div class="tip-item">
+      <span class="tip-icon">🐛</span>
+      <div>
+        <strong>Integrated Pest Management</strong>
+        <p>Use sticky traps, pheromone traps, and natural predators (lady beetles, spiders) before resorting to any spray.</p>
+      </div>
+    </div>
+    <div class="tip-item">
+      <span class="tip-icon">💧</span>
+      <div>
+        <strong>Water Conservation</strong>
+        <p>Use drip/sprinkler irrigation to reduce water use by 30–50%. Rainwater harvesting fills farm ponds for dry spells.</p>
+      </div>
+    </div>
+    <div class="tip-item">
+      <span class="tip-icon">🧪</span>
+      <div>
+        <strong>Soil Testing</strong>
+        <p>Test soil pH and nutrients every 2 years. Contact your nearest Krishi Vigyan Kendra (KVK) for free soil testing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Buttons -->
+<div class="form-actions centered">
+  <a href="/restart" class="btn btn-primary">🔄 Start New Recommendation</a>
+  <button onclick="window.print()" class="btn btn-secondary">🖨️ Print / Save Report</button>
+</div>
+
+{% endblock %}

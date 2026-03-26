@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Organic Farming Advisor{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">🌱</div>
+      <div>
+        <h1>Organic Farming Advisor</h1>
+        <p class="tagline">Ancient Wisdom · Organic Practices · Healthy Soil</p>
+      </div>
+    </div>
+    <nav class="steps-nav">
+      <span class="step {% block step1_class %}{% endblock %}">① Farmer Details</span>
+      <span class="arrow">›</span>
+      <span class="step {% block step2_class %}{% endblock %}">② Land &amp; Season</span>
+      <span class="arrow">›</span>
+      <span class="step {% block step3_class %}{% endblock %}">③ Fertilizer Choice</span>
+      <span class="arrow">›</span>
+      <span class="step {% block step4_class %}{% endblock %}">④ Recommendations</span>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>🌾 Promoting sustainable organic agriculture &nbsp;|&nbsp; Ancient farming wisdom for modern fields</p>
+  </footer>
+</body>
+</html>

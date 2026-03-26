@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Land &amp; Season Details – Organic Farming Advisor{% endblock %}
+{% block step2_class %}active{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h2>Step 2: Land, Season &amp; Water Details</h2>
+  <p class="subtitle">
+    Help us understand your land to recommend the best crops and organic practices for
+    <strong>{{ farmer.name }}'s</strong> {{ farmer.area }} {{ farmer.area_unit }} in <strong>{{ farmer.village }}</strong>.
+  </p>
+
+  <form action="/fertilizer-select" method="POST" novalidate>
+
+    <div class="form-grid">
+
+      <div class="form-group full-width">
+        <label>Soil Type <span class="required">*</span></label>
+        <div class="radio-card-group">
+          {% set soil_icons = {
+            'Clay': '🧱',
+            'Sandy': '🏜️',
+            'Loamy': '🟫',
+            'Black (Regur)': '⬛',
+            'Red': '🟥',
+            'Alluvial': '🏞️',
+            'Laterite': '🪨'
+          } %}
+          {% for soil in soil_types %}
+          <label class="radio-card">
+            <input type="radio" name="soil_type" value="{{ soil }}"
+                   {% if form and form.soil_type == soil %}checked{% endif %} required />
+            <span class="radio-card-icon">{{ soil_icons.get(soil, '🌍') }}</span>
+            <span class="radio-card-label">{{ soil }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% if errors and errors.soil_type %}
+          <span class="error">{{ errors.soil_type }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group full-width">
+        <label>Water Availability <span class="required">*</span></label>
+        <div class="radio-card-group">
+          {% set water_icons = {
+            'high_water': '💧💧💧',
+            'medium_water': '💧💧',
+            'low_water': '💧'
+          } %}
+          {% for key, label in water_levels.items() %}
+          <label class="radio-card water-card">
+            <input type="radio" name="water_level" value="{{ key }}"
+                   {% if form and form.water_level == key %}checked{% endif %} required />
+            <span class="radio-card-icon">{{ water_icons.get(key, '💧') }}</span>
+            <span class="radio-card-label">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% if errors and errors.water_level %}
+          <span class="error">{{ errors.water_level }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group full-width">
+        <label>Crop Season <span class="required">*</span></label>
+        <div class="radio-card-group">
+          {% set season_icons = {'Kharif': '🌧️', 'Rabi': '❄️', 'Zaid': '☀️'} %}
+          {% set season_desc = {
+            'Kharif': 'June – November (Monsoon season)',
+            'Rabi': 'November – April (Winter season)',
+            'Zaid': 'March – June (Summer season)'
+          } %}
+          {% for season in seasons %}
+          <label class="radio-card season-card">
+            <input type="radio" name="season" value="{{ season }}"
+                   {% if form and form.season == season %}checked{% endif %} required />
+            <span class="radio-card-icon">{{ season_icons.get(season, '🌾') }}</span>
+            <span class="radio-card-label">
+              <strong>{{ season }}</strong><br />
+              <small>{{ season_desc.get(season, '') }}</small>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% if errors and errors.season %}
+          <span class="error">{{ errors.season }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="weather">Weather / Climate Description <span class="required">*</span></label>
+        <input type="text" id="weather" name="weather"
+               value="{{ form.weather if form else '' }}"
+               placeholder="e.g., Semi-arid, Tropical humid, Dry, Coastal" required />
+        {% if errors and errors.weather %}
+          <span class="error">{{ errors.weather }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="soil_ph">Soil pH (if known)</label>
+        <input type="number" id="soil_ph" name="soil_ph"
+               value="{{ form.soil_ph if form else '' }}"
+               placeholder="e.g., 6.5" min="3" max="10" step="0.1" />
+        <small class="hint">Leave blank if not tested. pH 6–7 is ideal for most crops.</small>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="soil_health">Describe Your Soil Health / Problems (optional)</label>
+        <textarea id="soil_health" name="soil_health" rows="3"
+                  placeholder="e.g., Hard crust, poor growth in patches, yellowish leaves, low yield last season...">{{ form.soil_health if form else '' }}</textarea>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <a href="/" class="btn btn-secondary">← Back</a>
+      <button type="submit" class="btn btn-primary">
+        Next: Choose Fertilizer to Replace →
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}
